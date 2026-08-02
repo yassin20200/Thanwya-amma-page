@@ -1,1 +1,0 @@
-# Thanwya-amma-page

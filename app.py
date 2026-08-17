@@ -15,7 +15,7 @@ if not os.path.exists("./biology_db/chroma.sqlite3") and os.path.exists("./biolo
         zip_ref.extractall(".")
     print("✅ تم فك الضغط بنجاح!")
 
-app = FastAPI(title="Thanwya Amma Universal Engine")
+app = FastAPI(title="Thanwya Amma Gemini 3.6 Flash Engine")
 
 app.add_middleware(
     CORSMiddleware,
@@ -58,15 +58,14 @@ def get_embed_vector(text, key, client):
             raise Exception(f"Embed Error: {resp.text}")
 
 def generate_text_response(prompt, key, client):
-    # استخدام النموذج الحديث المعتمد حصرياً
     try:
         res = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-3.6-flash",
             contents=prompt
         )
         return res.text
     except Exception:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={key}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={key}"
         headers = {"Content-Type": "application/json", "x-goog-api-key": key}
         payload = {"contents": [{"parts": [{"text": prompt}]}]}
         resp = requests.post(url, headers=headers, json=payload)
@@ -77,7 +76,7 @@ def generate_text_response(prompt, key, client):
 
 @app.get("/")
 def home():
-    return {"status": "online", "message": "Thanwya Universal Engine is Ready!"}
+    return {"status": "online", "message": "Thanwya Gemini 3.6 Flash Engine is Ready!"}
 
 @app.post("/api/explain")
 async def explain_lesson(req: StudyRequest):
@@ -125,7 +124,7 @@ async def explain_lesson(req: StudyRequest):
 {f"تم العثور على مراجع مخصصة لمادة {req.subject} وهي: " + str(sources_used) if has_matching_docs else f"⚠️ تنبيه: لا توجد مذكرات مرفوعة حالياً تخص مادة ({req.subject}) في قاعدة البيانات."}
 
 [قواعد الشرح التعليمي الصارم]:
-1. إذا كانت المراجع تخص مادة {req.subject}، اعتمد عليها.
+1. إذا كانت المراجع تخص مادة {req.subject}، اعتمد عليها واذكر أنها من مذكراتهم.
 2. إذا لم تكن هناك مراجع تخص {req.subject} في قاعدة البيانات، ضع في بداية الرد تنبيهاً مباشراً:
    '> **⚠️ تنبيه المراجع:** لم نجد مذكرات مرفوعة لمادة ({req.subject}) في قاعدة البيانات حتى الآن. تم إعداد هذا الشرح بالاعتماد المباشر على كتاب وزارة التربية والتعليم المعتمد.'
    ثم اشرح الدرس بالكامل بأعلى درجات الدقة والتفصيل وفقاً لكتاب الوزارة.

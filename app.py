@@ -1,4 +1,5 @@
 import os
+import zipfile
 import chromadb
 import requests
 from fastapi import FastAPI, HTTPException
@@ -7,7 +8,14 @@ from pydantic import BaseModel
 from google import genai
 from google.genai import types
 
-app = FastAPI(title="Thanwya Amma Universal AQ-Compatible RAG Engine")
+# 1. فك ضغط قاعدة البيانات تلقائياً على السيرفر إذا كان الملف مضغوطاً
+if not os.path.exists("./biology_db/chroma.sqlite3") and os.path.exists("./biology_db.zip"):
+    print("📦 جاري فك ضغط قاعدة البيانات...")
+    with zipfile.ZipFile("./biology_db.zip", 'r') as zip_ref:
+        zip_ref.extractall(".")
+    print("✅ تم فك الضغط وجاهز للاستخدام!")
+
+app = FastAPI(title="Thanwya Amma Universal Engine")
 
 app.add_middleware(
     CORSMiddleware,
@@ -68,14 +76,13 @@ def generate_text_response(prompt, key, client):
 
 @app.get("/")
 def home():
-    return {"status": "online", "message": "Universal AQ-Ready Engine is Live!"}
+    return {"status": "online", "message": "Thanwya Universal Engine is Ready!"}
 
 @app.post("/api/explain")
 async def explain_lesson(req: StudyRequest):
     if not req.api_key:
         raise HTTPException(status_code=400, detail="يرجى توفير API Key صحيح.")
     
-    # تهيئة العميل بدعم خيارات مفاتيح AQ
     client = genai.Client(
         api_key=req.api_key,
         http_options=types.HttpOptions(headers={"x-goog-api-key": req.api_key})
@@ -99,25 +106,25 @@ async def explain_lesson(req: StudyRequest):
             if docs:
                 for idx, doc in enumerate(docs):
                     source_file = metas[idx].get("source", "مرجع عام") if metas else "مرجع"
-                    retrieved_context += f"\n--- [من المرجع المعتمد: {source_file}] ---\n{doc}\n"
+                    retrieved_context += f"\n--- [من المرجع: {source_file}] ---\n{doc}\n"
                     if source_file not in sources_used:
                         sources_used.append(source_file)
         except Exception as e:
-            print(f"⚠️ تنبيه استعلام ChromaDB: {e}")
+            print(f"⚠️ تنبيه ChromaDB: {e}")
 
     universal_system_instruction = f"""
-أنت موجه أول وخبير تربوي في المنهج المصري للثانوية العامة لجميع المواد لمسار ({'علمي علوم' if req.track == 'science' else 'علمي رياضة'}).
-مهمتك الشرح الدقيق والإجابة عن درس "{req.lesson}" في مادة "{req.subject}".
+أنت موجه أول وخبير تربوي في المنهج المصري للثانوية العامة لمادة ({req.subject}) لمسار ({'علمي علوم' if req.track == 'science' else 'علمي رياضة'}).
+مهمتك الشرح الوافي والدقيق لدرس "{req.lesson}" في مادة "{req.subject}".
 
-[قواعد صارمة شاملة لجميع المواد وتريكات الامتحانات]:
-1. الالتزام الصارم والحصري بالمصطلحات والقوانين الرسمية المقررة بكتاب وزارة التربية والتعليم المصرية للمادة، ويمنع استخدام مصطلحات جامعية أو خارجية تشتت الطالب.
-2. التنبيه على "التريكات النقاط الحرجة" بوضوح شديد، كالتالي:
-   - في الفيزياء والرياضيات: توضيح دلالات الرموز، وحدات القياس، إشارات المسارات (ككيرشوف)، والشروط الخاصة بكل قانون.
-   - في الكيمياء: شروط التفاعلات، أرقام الأكسدة، العوامل الحفازة، وقواعد التسمية بالـ IUPAC المعتمدة بالوزارة.
-   - في الأحياء والجيولوجيا: التفرقة الدقيقة بين المفاهيم المتشابهة، الاتجاهات، أجزاء التركيب، والإنزيمات المقررة فقط دون حشو.
-3. التمهيد والتأسيس التراكمي إذا كان الدرس يعتمد على مفاهيم من سنوات سابقة.
-4. اعتماد إجابتك على النصوص والمراجع المرفوعة التالية من كتبكم:
-{retrieved_context if retrieved_context else "استند لمناهج وزارة التربية والتعليم المصرية المعتمدة."}
+[قواعد الشرح والتنفيذ الصارم]:
+1. اشرح درس "{req.lesson}" في مادة "{req.subject}" شرحاً تعليمياً شاملاً وتفصيلياً ومبسطاً وفقاً لمنهج وزارة التربية والتعليم المصرية للثانوية العامة.
+2. إذا كانت المراجع المرفوعة أدناه تحتوي على معلومات مفيدة للمادة، استند إليها واعتمد عليها.
+3. إذا كانت المراجع المرفوعة تخص مادة أخرى أو لا تغطي الدرس بالكامل، اشرح الدرس بالكامل من واقع معرفتك التامة والعميقة بالمنهج المصري الرسمي للثانوية العامة لمادة "{req.subject}". لا تعتذر ولا ترفض الشرح أبداً.
+4. التزم بجميع المصطلحات الرسمية، والتريكات، والنقاط الحرجة وأسئلة الامتحانات المعتمدة للمادة.
+5. اختتم الشرح بقسم "مفكرة التلخيص السريع".
+
+[المراجع المتاحة في قاعدة البيانات]:
+{retrieved_context if retrieved_context else "اعتمد على المنهج المصري المعتمد لكتاب الوزارة مباشرة."}
 """
 
     if req.user_query.strip():
@@ -127,8 +134,8 @@ async def explain_lesson(req: StudyRequest):
 
 قم بشرح الدرس طبقاً للهيكل التفاعلي التالي:
 1. التمهيد والتأسيس التراكمي المطلوب للدرس.
-2. الشرح التفصيلي للمفاهيم والقوانين وتفكيك رموزها بالتفصيل.
-3. قسم خاص بعنوان "⚠️ تريكات وأفكار امتحانات المادة" يوضح النقاط التي تتكرر فيها الأخطاء بأسئلة الاختيار من متعدد.
+2. الشرح التفصيلي للمفاهيم والقوانين وتفكيك القواعد بالتفصيل.
+3. قسم خاص بعنوان "⚠️ تريكات وأفكار امتحانات المادة" يوضح النقاط التي تتكرر فيها الأخطاء بأسئلة الامتحانات.
 4. قسم خاص بعنوان "مفكرة التلخيص السريع" يضم الملخص المباشر المجهز للحفظ والمراجعة.
 """
 

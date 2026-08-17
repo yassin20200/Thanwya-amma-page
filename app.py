@@ -6,7 +6,7 @@ from pypdf import PdfReader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 # مفتاح الـ API الخاص بك
-API_KEY = "AIzaSyD2AVypwIsLe7CeYoZX_ZhQatQ9FqNcAQM"
+API_KEY = "AQ.Ab8RN6LU7fluCcOsz6ULGwMtuqWyrdEFr92dNjXAdxGIusR9gg"
 
 PDF_FOLDER = "./biology_pdfs"
 if not os.path.exists(PDF_FOLDER):

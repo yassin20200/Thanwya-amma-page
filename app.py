@@ -8,14 +8,14 @@ from pydantic import BaseModel
 from google import genai
 from google.genai import types
 
-# 1. فك ضغط قاعدة البيانات تلقائياً على السيرفر إذا كان الملف مضغوطاً
+# فك ضغط قاعدة البيانات تلقائياً على السيرفر
 if not os.path.exists("./biology_db/chroma.sqlite3") and os.path.exists("./biology_db.zip"):
     print("📦 جاري فك ضغط قاعدة البيانات...")
     with zipfile.ZipFile("./biology_db.zip", 'r') as zip_ref:
         zip_ref.extractall(".")
-    print("✅ تم فك الضغط وجاهز للاستخدام!")
+    print("✅ تم فك الضغط بنجاح!")
 
-app = FastAPI(title="Thanwya Amma Universal Engine")
+app = FastAPI(title="Thanwya Amma Smart Context Engine")
 
 app.add_middleware(
     CORSMiddleware,
@@ -76,7 +76,7 @@ def generate_text_response(prompt, key, client):
 
 @app.get("/")
 def home():
-    return {"status": "online", "message": "Thanwya Universal Engine is Ready!"}
+    return {"status": "online", "message": "Smart Thanwya Engine is Ready!"}
 
 @app.post("/api/explain")
 async def explain_lesson(req: StudyRequest):
@@ -92,6 +92,8 @@ async def explain_lesson(req: StudyRequest):
     retrieved_context = ""
     sources_used = []
     
+    # 1. البحث والتحقق من تطابق المادة في قاعدة البيانات
+    has_matching_docs = False
     if collection and collection.count() > 0:
         try:
             query_vector = get_embed_vector(search_text, req.api_key, client)
@@ -105,38 +107,48 @@ async def explain_lesson(req: StudyRequest):
             
             if docs:
                 for idx, doc in enumerate(docs):
-                    source_file = metas[idx].get("source", "مرجع عام") if metas else "مرجع"
-                    retrieved_context += f"\n--- [من المرجع: {source_file}] ---\n{doc}\n"
-                    if source_file not in sources_used:
-                        sources_used.append(source_file)
+                    source_file = metas[idx].get("source", "") if metas else ""
+                    # التحقق الذكي: هل المرجع يخص المادة المطلوبة أم مادة أخرى؟
+                    if ("أحياء" in req.subject and any(x in source_file for x in ["أحياء", "احياء", "الهيكل", "النفيس", "الشامل"])) or \
+                       ("عرب" in req.subject and any(x in source_file for x in ["عرب", "نحو", "أدب", "بلاغة", "الأيام", "الكيان", "الأضواء", "الامتحان"])):
+                        has_matching_docs = True
+                        retrieved_context += f"\n--- [من المرجع: {source_file}] ---\n{doc}\n"
+                        if source_file not in sources_used:
+                            sources_used.append(source_file)
         except Exception as e:
-            print(f"⚠️ تنبيه ChromaDB: {e}")
+            print(f"⚠️ تنبيه استعلام ChromaDB: {e}")
 
+    # 2. صياغة التوجيه مع التنبيه الذكي
     universal_system_instruction = f"""
-أنت موجه أول وخبير تربوي في المنهج المصري للثانوية العامة لمادة ({req.subject}) لمسار ({'علمي علوم' if req.track == 'science' else 'علمي رياضة'}).
-مهمتك الشرح الوافي والدقيق لدرس "{req.lesson}" في مادة "{req.subject}".
+أنت أستاذ وموجه أول تربوي خبير في المنهج المصري للثانوية العامة لمادة ({req.subject}) لمسار ({'علمي علوم' if req.track == 'science' else 'علمي رياضة'}).
+مهمتك الشرح التعليمي الدقيق لدرس "{req.lesson}" في مادة "{req.subject}".
 
-[قواعد الشرح والتنفيذ الصارم]:
-1. اشرح درس "{req.lesson}" في مادة "{req.subject}" شرحاً تعليمياً شاملاً وتفصيلياً ومبسطاً وفقاً لمنهج وزارة التربية والتعليم المصرية للثانوية العامة.
-2. إذا كانت المراجع المرفوعة أدناه تحتوي على معلومات مفيدة للمادة، استند إليها واعتمد عليها.
-3. إذا كانت المراجع المرفوعة تخص مادة أخرى أو لا تغطي الدرس بالكامل، اشرح الدرس بالكامل من واقع معرفتك التامة والعميقة بالمنهج المصري الرسمي للثانوية العامة لمادة "{req.subject}". لا تعتذر ولا ترفض الشرح أبداً.
-4. التزم بجميع المصطلحات الرسمية، والتريكات، والنقاط الحرجة وأسئلة الامتحانات المعتمدة للمادة.
-5. اختتم الشرح بقسم "مفكرة التلخيص السريع".
+[حالة المراجع المرفوعة في قاعدة البيانات]:
+{f"تم العثور على مراجع مخصصة لمادة {req.subject} وهي: " + str(sources_used) if has_matching_docs else f"⚠️ تنبيه: لا توجد مذكرات مرفوعة حالياً تخص مادة ({req.subject}) في قاعدة البيانات."}
 
-[المراجع المتاحة في قاعدة البيانات]:
-{retrieved_context if retrieved_context else "اعتمد على المنهج المصري المعتمد لكتاب الوزارة مباشرة."}
+[قواعد الشرح الإجبارية]:
+1. إذا كانت المراجع المرفوعة تخص مادة {req.subject}، اعتمد عليها واذكر أن الشرح مدعوم بمذكراتهم.
+2. إذا لم تكن هناك مراجع تخص {req.subject} في قاعدة البيانات، ضع في بداية الرد تنبيهاً لطيفاً وواضحاً:
+   '> **⚠️ تنبيه المراجع:** لم نجد مذكرات مرفوعة لمادة ({req.subject}) في قاعدة البيانات حتى الآن. تم إعداد هذا الشرح بالاعتماد المباشر على كتاب وزارة التربية والتعليم المعتمد.'
+   ثم اشرح الدرس بالكامل بأعلى درجات الدقة والتفصيل وفقاً لكتاب الوزارة.
+3. التزم بجميع القواعد الرسمية والتريكات وأفكار الامتحانات المعتمدة.
+4. اختتم الشرح بـ "مفكرة التلخيص السريع".
+
+[المحتوى المستخرج من المراجع]:
+{retrieved_context if has_matching_docs else "لا توجد نصوص مرفوعة لهذه المادة."}
 """
 
     if req.user_query.strip():
-        prompt = f"{universal_system_instruction}\n\nسؤال/استفسار الطالب المحدد: '{req.user_query}'\nأجب بدقة متناهية مع توضيح فكرة السؤال والتريكة المعتمدة فيه بالمنهج."
+        prompt = f"{universal_system_instruction}\n\nسؤال الطالب: '{req.user_query}'\nأجب بدقة مع التريكات."
     else:
         prompt = f"""{universal_system_instruction}
 
-قم بشرح الدرس طبقاً للهيكل التفاعلي التالي:
-1. التمهيد والتأسيس التراكمي المطلوب للدرس.
-2. الشرح التفصيلي للمفاهيم والقوانين وتفكيك القواعد بالتفصيل.
-3. قسم خاص بعنوان "⚠️ تريكات وأفكار امتحانات المادة" يوضح النقاط التي تتكرر فيها الأخطاء بأسئلة الامتحانات.
-4. قسم خاص بعنوان "مفكرة التلخيص السريع" يضم الملخص المباشر المجهز للحفظ والمراجعة.
+الهيكل الإجباري للشرح:
+### شرح درس: {req.lesson} ({req.subject})
+1. التمهيد والتأسيس التراكمي المطلوب.
+2. الشرح والتفكيك التفصيلي للقواعد والمفاهيم.
+3. ⚠️ تريكات وأفكار امتحانات المادة.
+4. مفكرة التلخيص السريع.
 """
 
     try:
@@ -144,7 +156,7 @@ async def explain_lesson(req: StudyRequest):
         return {
             "status": "success",
             "explanation": explanation_text,
-            "sources": sources_used
+            "sources": sources_used if has_matching_docs else ["منهج وزارة التربية والتعليم الرسمي (لم يتم رفع مذكرات للمادة بعد)"]
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"خطأ أثناء التوليد: {str(e)}")

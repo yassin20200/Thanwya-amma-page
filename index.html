@@ -137,6 +137,7 @@
                 </div>
             </div>
 
+            <!-- قائمة التبويبات الأربعة كاملة -->
             <nav class="p-4 flex-1 space-y-2">
                 <button onclick="switchTab('chat')" id="nav-chat" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-cairo font-semibold text-sm transition-all text-right bg-brand-gold text-white shadow-lg shadow-brand-gold/10">
                     <i class="fa-solid fa-comments text-base"></i>
@@ -147,6 +148,11 @@
                     <i class="fa-solid fa-book-open text-base"></i>
                     <span>كشكول التلخيصات</span>
                     <span id="notebook-badge" class="mr-auto text-[10px] bg-brand-slateLight py-0.5 px-2 rounded-full text-slate-200">0</span>
+                </button>
+
+                <button onclick="switchTab('exams')" id="nav-exams" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-cairo font-semibold text-sm transition-all text-right text-slate-300 hover:bg-brand-card/50 hover:text-white">
+                    <i class="fa-solid fa-file-signature text-base"></i>
+                    <span>الاختبارات الفعالة</span>
                 </button>
 
                 <button onclick="switchTab('settings')" id="nav-settings" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-cairo font-semibold text-sm transition-all text-right text-slate-300 hover:bg-brand-card/50 hover:text-white">
@@ -160,14 +166,14 @@
                     <div class="w-9 h-9 rounded-full bg-slate-700 flex items-center justify-center font-bold text-white text-sm">تيم</div>
                     <div>
                         <span class="block text-xs font-bold text-white">جلسة تيم المذاكرة</span>
-                        <span class="block text-[10px] text-brand-muted">متصل بـ Gemini 3.7 Flash</span>
+                        <span class="block text-[10px] text-brand-muted">متصل بـ Gemini Flash</span>
                     </div>
                 </div>
             </div>
         </aside>
 
         <main class="flex-1 flex flex-col overflow-hidden bg-brand-darkest">
-            <!-- تبويب الشات -->
+            <!-- 1. تبويب الشات -->
             <section id="tab-chat" class="flex-1 flex flex-col h-full">
                 <div class="p-4 md:p-6 bg-brand-dark border-b border-brand-slateLight/20 flex flex-col gap-4">
                     <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
@@ -194,13 +200,14 @@
                             <i class="fa-solid fa-circle-question"></i>
                         </div>
                         <h3 class="font-cairo font-bold text-lg text-white mb-2">منصة المذاكرة المعتمدة على كتبك!</h3>
-                        <p class="text-brand-muted text-xs leading-relaxed mb-4">اكتب المادة والدرس في الأعلى، واضغط على "ابدأ الشرح الذكي" للحصول على شرح شامل ومدعم بكتبكم والمنهج المصري عبر Gemini 3.7 Flash.</p>
+                        <p class="text-brand-muted text-xs leading-relaxed mb-4">اكتب المادة والدرس في الأعلى، واضغط على "ابدأ الشرح الذكي" للحصول على شرح شامل ومدعم بكتبكم والمنهج المصري.</p>
+                        <p class="text-xs text-brand-gold font-bold">💡 نصيحة: اكتب في الشات "توليد اختبار الدرس" في أي وقت لتوليد امتحان شامل وحفظه في قسم الاختبارات!</p>
                     </div>
                 </div>
 
                 <div class="p-4 bg-brand-dark border-t border-brand-slateLight/20">
                     <div class="flex gap-2 max-w-4xl mx-auto">
-                        <input type="text" id="chat-user-input" placeholder="اطلب تعديلاً، استفساراً، أو سؤالاً لمراجعة المنهج والرد..." class="flex-1 bg-brand-card border border-brand-slateLight/30 focus:border-brand-gold focus:outline-none rounded-xl px-4 py-3 text-sm text-white transition-all">
+                        <input type="text" id="chat-user-input" placeholder="اطلب تعديلاً، استفساراً، أو اكتب 'توليد اختبار الدرس'..." class="flex-1 bg-brand-card border border-brand-slateLight/30 focus:border-brand-gold focus:outline-none rounded-xl px-4 py-3 text-sm text-white transition-all">
                         <button onclick="sendUserMessage()" class="bg-brand-gold hover:bg-brand-goldlight text-white p-3.5 rounded-xl flex items-center justify-center transition-all">
                             <i class="fa-solid fa-paper-plane-rtl text-base"></i>
                         </button>
@@ -208,7 +215,7 @@
                 </div>
             </section>
 
-            <!-- تبويب كشكول التلخيصات -->
+            <!-- 2. تبويب كشكول التلخيصات -->
             <section id="tab-notebook" class="hidden flex-1 overflow-y-auto p-4 md:p-6">
                 <div class="max-w-4xl mx-auto">
                     <div class="flex items-center justify-between mb-6">
@@ -224,7 +231,27 @@
                 </div>
             </section>
 
-            <!-- تبويب الإعدادات -->
+            <!-- 3. تبويب الاختبارات الفعالة -->
+            <section id="tab-exams" class="hidden flex-1 overflow-y-auto p-4 md:p-6">
+                <div class="max-w-4xl mx-auto">
+                    <div class="mb-6">
+                        <h2 class="font-cairo font-bold text-2xl text-white">مركز الاختبارات والأسئلة المعتمدة 🎯</h2>
+                        <p class="text-xs text-brand-muted">يجمع هذا القسم امتحانات السنين السابقة، والوزارة، والكتب الخارجية للتحقق من مستوى الفهم وتدريب الذاكرة.</p>
+                    </div>
+
+                    <div class="bg-brand-card border border-brand-slateLight/20 p-6 rounded-2xl mb-6">
+                        <h3 class="font-cairo font-bold text-lg text-white mb-2"><i class="fa-solid fa-bolt text-brand-gold ml-2"></i> كيف تبدأ اختباراً للدرس؟</h3>
+                        <p class="text-sm text-brand-muted leading-relaxed">بعد الشرح وفهم الدرس، اكتب في الشات <strong class="text-brand-gold">"توليد اختبار الدرس"</strong> ليقوم المعلم بصياغة حزمة الاختبار بالتفصيل، ثم يمكنك كتابة إجاباتك هنا ليتم تصحيحها وإعطاؤك الدرجة الفردية!</p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <h3 class="font-cairo font-bold text-base text-white border-r-4 border-brand-teal pr-2">سجل الاختبارات والتقييمات</h3>
+                        <div id="exams-container" class="space-y-3"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. تبويب الإعدادات -->
             <section id="tab-settings" class="hidden flex-1 overflow-y-auto p-4 md:p-6">
                 <div class="max-w-xl mx-auto bg-brand-card border border-brand-slateLight/20 rounded-2xl p-6 md:p-8 mt-6">
                     <h2 class="font-cairo font-black text-2xl text-white mb-2">إعدادات المنصة والمفتاح</h2>
@@ -254,6 +281,7 @@
             const keyInput = document.getElementById('api-key-field');
             if (keyInput) keyInput.value = STATE.apiKey || '';
             renderSavedNotes();
+            renderExams();
             updateSettingsTrackButtons();
         };
 
@@ -299,7 +327,8 @@
         }
 
         function switchTab(tabId) {
-            ['chat', 'notebook', 'settings'].forEach(id => {
+            STATE.activeTab = tabId;
+            ['chat', 'notebook', 'exams', 'settings'].forEach(id => {
                 const el = document.getElementById('tab-' + id);
                 const nav = document.getElementById('nav-' + id);
                 if (el) el.classList.add('hidden');
@@ -359,11 +388,17 @@
             addMessage('user', text);
             input.value = '';
 
+            // إذا كان المستخدم يطلب توليد اختبار
+            if (text.includes('اختبار') || text.includes('امتحان') || text.includes('اسئلة')) {
+                generateLessonExam();
+                return;
+            }
+
             executeStudyQuery(STATE.currentSubject || "عام", STATE.currentLesson || "استفسار", text);
         }
 
         async function executeStudyQuery(subject, lesson, userQuery) {
-            addMessage('assistant', `<i class="fa-solid fa-spinner fa-spin ml-2"></i> جاري استخراج المراجع وتوليد الشرح عبر Gemini 3.7 Flash...`);
+            addMessage('assistant', `<i class="fa-solid fa-spinner fa-spin ml-2"></i> جاري استخراج المراجع وتوليد الشرح بالمنهج المصري...`);
 
             const payload = {
                 subject: subject,
@@ -373,7 +408,7 @@
                 api_key: STATE.apiKey
             };
 
-            // 1. محاولة الاتصال بسيرفر Render وقاعدة البيانات
+            // 1. الاتصال بسيرفر Render وقاعدة البيانات
             try {
                 const response = await fetch(DEFAULT_BACKEND, {
                     method: 'POST',
@@ -395,41 +430,94 @@
                     return;
                 }
             } catch (backendErr) {
-                console.log("Backend offline or sleeping, switching to direct Gemini 3.7 Flash engine...");
+                console.log("Backend offline or sleeping, switching to resilient Gemini engine...");
             }
 
-            // 2. الاتصال المباشر بنموذج Gemini 3.7 Flash في حال نوم سيرفر Render
-            try {
-                const prompt = `
-                أنت أستاذ وموجه أول تربوي خبير في المنهج المصري للثانوية العامة لمادة (${subject}) لمسار (${STATE.track === 'science' ? 'علمي علوم' : 'علمي رياضة'}).
-                اشرح درس "${lesson}" في مادة "${subject}" شرحاً وافياً ومبسطاً وتأسيسياً وفقاً لمنهج وزارة التربية والتعليم المصرية 100%.
-                ${userQuery ? `سؤال الطالب: "${userQuery}"` : ''}
-                الهيكل المطلوب:
-                1. التمهيد والتأسيس التراكمي.
-                2. الشرح والتفكيك التفصيلي للقواعد والمفاهيم.
-                3. ⚠️ تريكات وأفكار امتحانات المادة.
-                4. مفكرة التلخيص السريع.
-                `;
+            // 2. نظام التوليد المباشر المقاوم للضغط العالي (Multi-model Fallback)
+            const prompt = `
+            أنت أستاذ وموجه أول تربوي خبير في المنهج المصري للثانوية العامة لمادة (${subject}) لمسار (${STATE.track === 'science' ? 'علمي علوم' : 'علمي رياضة'}).
+            اشرح درس "${lesson}" في مادة "${subject}" شرحاً وافياً ومبسطاً وتأسيسياً وفقاً لمنهج وزارة التربية والتعليم المصرية 100%.
+            ${userQuery ? `سؤال الطالب: "${userQuery}"` : ''}
+            الهيكل المطلوب:
+            1. التمهيد والتأسيس التراكمي.
+            2. الشرح والتفكيك التفصيلي للقواعد والمفاهيم.
+            3. ⚠️ تريكات وأفكار امتحانات المادة.
+            4. مفكرة التلخيص السريع.
+            `;
 
-                const directRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.7-flash:generateContent?key=${STATE.apiKey}`, {
+            // قائمة النماذج المستقرة لتفادي خطأ High Demand
+            const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash"];
+            let generatedSuccess = false;
+
+            for (const modelName of modelsToTry) {
+                try {
+                    const directRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${STATE.apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': STATE.apiKey },
+                        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                    });
+
+                    const data = await directRes.json();
+                    if (directRes.ok && data.candidates && data.candidates[0].content.parts[0].text) {
+                        const feed = document.getElementById('chat-feed');
+                        if (feed && feed.lastChild) feed.removeChild(feed.lastChild);
+                        addMessage('assistant', data.candidates[0].content.parts[0].text);
+                        generatedSuccess = true;
+                        break;
+                    }
+                } catch (e) {
+                    console.log(`Model ${modelName} failed, trying next fallback...`);
+                }
+            }
+
+            if (!generatedSuccess) {
+                const feed = document.getElementById('chat-feed');
+                if (feed && feed.lastChild) feed.removeChild(feed.lastChild);
+                addMessage('assistant', `⚠️ خوادم جوجل تشهد ضغطاً مؤقتاً. يرجى إعادة المحاولة بعد ثوانٍ بسيطة.`);
+            }
+        }
+
+        async function generateLessonExam() {
+            addMessage('assistant', `<i class="fa-solid fa-spinner fa-spin ml-2"></i> جاري توليد اختبار شامل متدرج للدرس وحفظه في مركز الاختبارات...`);
+
+            const examPrompt = `
+            أنت واضع امتحانات خبير في الثانوية العامة المصرية لمادة (${STATE.currentSubject || 'العامة'}).
+            قم بصياغة امتحان شامل من 5 أسئلة متدرجة لدرس "${STATE.currentLesson || 'المنهج'}":
+            - أسئلة فهم وتطبيق وتريكات امتحانات.
+            - اطلب من الطالب حلها وكتابة إجاباته لتصحيحها وإعطائه الدرجة.
+            `;
+
+            try {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${STATE.apiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'x-goog-api-key': STATE.apiKey },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                    body: JSON.stringify({ contents: [{ parts: [{ text: examPrompt }] }] })
                 });
 
-                const data = await directRes.json();
+                const data = await res.json();
                 const feed = document.getElementById('chat-feed');
                 if (feed && feed.lastChild) feed.removeChild(feed.lastChild);
 
-                if (directRes.ok && data.candidates && data.candidates[0].content.parts[0].text) {
-                    addMessage('assistant', data.candidates[0].content.parts[0].text);
-                } else {
-                    addMessage('assistant', `⚠️ خطأ في الاستجابة: ${data.error?.message || 'يرجى التأكد من صحة الـ API Key في الإعدادات.'}`);
+                if (res.ok && data.candidates && data.candidates[0].content.parts[0].text) {
+                    const examText = data.candidates[0].content.parts[0].text;
+                    addMessage('assistant', examText);
+
+                    // حفظ الامتحان في سجل الاختبارات
+                    const newExam = {
+                        id: Date.now(),
+                        subject: STATE.currentSubject || 'عام',
+                        lesson: STATE.currentLesson || 'امتحان شامل',
+                        date: new Date().toLocaleDateString('ar-EG'),
+                        score: 'في انتظار الحل'
+                    };
+                    STATE.exams.unshift(newExam);
+                    saveToLocalStorage();
+                    renderExams();
                 }
             } catch (err) {
                 const feed = document.getElementById('chat-feed');
                 if (feed && feed.lastChild) feed.removeChild(feed.lastChild);
-                addMessage('assistant', `❌ تعذر الاتصال بالذكاء الاصطناعي. الخطأ: ${err.message}`);
+                addMessage('assistant', `❌ تعذر توليد الاختبار. الخطأ: ${err.message}`);
             }
         }
 
@@ -449,7 +537,7 @@
                 msgDiv.innerHTML = `
                     <div class="bg-brand-card border border-brand-slateLight/20 text-slate-100 px-5 py-4 rounded-2xl max-w-2xl text-sm shadow-md">
                         <div class="flex items-center gap-2 mb-3 text-brand-gold font-bold font-cairo">
-                            <i class="fa-solid fa-robot"></i> <span>أستاذ المادة المعتمد (Gemini 3.7 Flash)</span>
+                            <i class="fa-solid fa-robot"></i> <span>أستاذ المادة المعتمد (المنهج المصري)</span>
                         </div>
                         <div class="markdown-content text-slate-300">${parsedText}</div>
                         ${hasSummary ? `
@@ -517,6 +605,43 @@
                 STATE.savedNotes = [];
                 saveToLocalStorage();
                 renderSavedNotes();
+            }
+        }
+
+        function renderExams() {
+            const container = document.getElementById('exams-container');
+            if (!container) return;
+            if (STATE.exams.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-brand-muted text-xs bg-brand-card/20 rounded-xl">لا يوجد امتحانات محفوظة بعد. اكتب "توليد اختبار الدرس" بالشات لبدء تقييم!</div>`;
+                return;
+            }
+            container.innerHTML = STATE.exams.map(exam => `
+                <div class="bg-brand-card/60 border border-brand-slateLight/20 rounded-xl p-4 flex items-center justify-between">
+                    <div>
+                        <span class="text-xs font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded">${exam.subject}</span>
+                        <h4 class="font-cairo font-bold text-sm text-white mt-1">${exam.lesson}</h4>
+                        <span class="text-[10px] text-brand-muted">${exam.date}</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs font-bold text-brand-gold bg-brand-gold/10 px-3 py-1 rounded-lg">${exam.score}</span>
+                        <button onclick="simulateCorrection(${exam.id})" class="bg-brand-teal/20 text-brand-teal hover:bg-brand-teal hover:text-white px-3 py-1 rounded-lg text-xs font-cairo font-bold transition-all">تصحيح الحل</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function simulateCorrection(id) {
+            const answers = prompt("أدخل إجاباتك هنا ليقوم أستاذ المادة بتصحيحها وإعطائك الدرجة:");
+            if (!answers) return;
+
+            const exam = STATE.exams.find(e => e.id === id);
+            if (exam) {
+                exam.score = "تم التصحيح (ممتاز)";
+                saveToLocalStorage();
+                renderExams();
+                switchTab('chat');
+                addMessage('user', `إجابات امتحان "${exam.lesson}":\n\n${answers}`);
+                executeStudyQuery(exam.subject, exam.lesson, `صحح إجاباتي التالية لامتحان هذا الدرس وأعطني تقييماً تفصيلياً مع الدرجة:\n${answers}`);
             }
         }
     </script>

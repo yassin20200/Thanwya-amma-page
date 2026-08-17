@@ -166,7 +166,7 @@
                     <div class="w-9 h-9 rounded-full bg-slate-700 flex items-center justify-center font-bold text-white text-sm">تيم</div>
                     <div>
                         <span class="block text-xs font-bold text-white">جلسة تيم المذاكرة</span>
-                        <span class="block text-[10px] text-brand-muted">متصل بـ محرك المنهج المصري</span>
+                        <span class="block text-[10px] text-brand-muted">متصل بـ Gemini 3.6 Flash</span>
                     </div>
                 </div>
             </div>
@@ -200,7 +200,7 @@
                             <i class="fa-solid fa-circle-question"></i>
                         </div>
                         <h3 class="font-cairo font-bold text-lg text-white mb-2">منصة المذاكرة المعتمدة على كتبك!</h3>
-                        <p class="text-brand-muted text-xs leading-relaxed mb-4">اكتب المادة والدرس في الأعلى، واضغط على "ابدأ الشرح الذكي" للحصول على شرح شامل ومدعم بكتبكم والمنهج المصري.</p>
+                        <p class="text-brand-muted text-xs leading-relaxed mb-4">اكتب المادة والدرس في الأعلى، واضغط على "ابدأ الشرح الذكي" للحصول على شرح شامل ومدعم بكتبكم والمنهج المصري عبر Gemini 3.6 Flash.</p>
                         <p class="text-xs text-brand-gold font-bold">💡 نصيحة: اكتب في الشات "توليد اختبار الدرس" في أي وقت لتوليد امتحان شامل وحفظه في قسم الاختبارات!</p>
                     </div>
                 </div>
@@ -397,7 +397,7 @@
         }
 
         async function executeStudyQuery(subject, lesson, userQuery) {
-            addMessage('assistant', `<i class="fa-solid fa-spinner fa-spin ml-2"></i> جاري استخراج المراجع وتوليد الشرح بالمنهج المصري...`);
+            addMessage('assistant', `<i class="fa-solid fa-spinner fa-spin ml-2"></i> جاري استخراج المراجع وتوليد الشرح عبر Gemini 3.6 Flash...`);
 
             const payload = {
                 subject: subject,
@@ -431,10 +431,10 @@
                     }
                 }
             } catch (backendErr) {
-                console.log("Backend offline or sleeping, switching to direct Google endpoint...");
+                console.log("Backend offline or sleeping, switching to direct Google Gemini 3.6 Flash...");
             }
 
-            // 2. الاتصال المباشر بجوجل بطريقة CORS-Safe المتوافقة مع المتصفحات
+            // 2. الاتصال المباشر بنموذج Gemini 3.6 Flash المعتمد رسمياً
             const prompt = `
             أنت أستاذ وموجه أول تربوي خبير في المنهج المصري للثانوية العامة لمادة (${subject}) لمسار (${STATE.track === 'science' ? 'علمي علوم' : 'علمي رياضة'}).
             اشرح درس "${lesson}" في مادة "${subject}" شرحاً وافياً ومبسطاً وتأسيسياً وفقاً لمنهج وزارة التربية والتعليم المصرية 100%.
@@ -448,7 +448,7 @@
             `;
 
             try {
-                const directRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(STATE.apiKey)}`, {
+                const directRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${encodeURIComponent(STATE.apiKey)}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
@@ -472,7 +472,7 @@
         }
 
         async function generateLessonExam() {
-            addMessage('assistant', `<i class="fa-solid fa-spinner fa-spin ml-2"></i> جاري توليد اختبار شامل متدرج للدرس وحفظه في مركز الاختبارات...`);
+            addMessage('assistant', `<i class="fa-solid fa-spinner fa-spin ml-2"></i> جاري توليد اختبار شامل متدرج للدرس عبر Gemini 3.6 Flash...`);
 
             const examPrompt = `
             أنت واضع امتحانات خبير في الثانوية العامة المصرية لمادة (${STATE.currentSubject || 'العامة'}).
@@ -482,7 +482,7 @@
             `;
 
             try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(STATE.apiKey)}`, {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${encodeURIComponent(STATE.apiKey)}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ contents: [{ parts: [{ text: examPrompt }] }] })
@@ -532,7 +532,7 @@
                 msgDiv.innerHTML = `
                     <div class="bg-brand-card border border-brand-slateLight/20 text-slate-100 px-5 py-4 rounded-2xl max-w-2xl text-sm shadow-md">
                         <div class="flex items-center gap-2 mb-3 text-brand-gold font-bold font-cairo">
-                            <i class="fa-solid fa-robot"></i> <span>أستاذ المادة المعتمد (المنهج المصري)</span>
+                            <i class="fa-solid fa-robot"></i> <span>أستاذ المادة المعتمد (Gemini 3.6 Flash)</span>
                         </div>
                         <div class="markdown-content text-slate-300">${parsedText}</div>
                         ${hasSummary ? `

@@ -9,7 +9,7 @@ from google import genai
 from google.genai import types
 
 # 1. فك ضغط قاعدة البيانات تلقائياً على السيرفر (أو تحميلها إذا كان هناك رابط DB_ZIP_URL)
-DB_ZIP_URL = os.environ.get("DB_ZIP_URL", "")
+DB_ZIP_URL = os.environ.get("https://github.com/yassin20200/Thanwya-amma-page/releases/download/v1.0/biology_db.2.zip")
 
 if not os.path.exists("./biology_db/chroma.sqlite3"):
     if DB_ZIP_URL:
